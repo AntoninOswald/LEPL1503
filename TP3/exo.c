@@ -88,7 +88,7 @@ int main()
 
     print_digit(5);
 
-    buf_strcpy(*"ABC");
+    
 
     return 0;
 
