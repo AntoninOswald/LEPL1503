@@ -86,7 +86,7 @@ int main()
 {
     printf("Hello world!\n");
 
-    print_digit(5);
+    print_digit(10);
 
     
 
