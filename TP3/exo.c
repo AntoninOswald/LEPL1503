@@ -46,11 +46,49 @@ int strcasecmp(const char *s1, const char *s2) {
 }
 
 
+
+char *buf_strcpy(const char *src) {
+
+    if (src == NULL)
+    {
+        return NULL;
+    }
+
+    char *x;
+    x = (char *)malloc((strlen(src)+1)*sizeof(char));  /*    Multiplier la longueur du string par la taille du type de donnée*/
+
+    
+    
+
+    for (int i = 0; i < strlen(src) +1; i++)
+    {
+        
+        *(x+i) = src[i];
+
+    }
+
+    *(x+strlen(src)) = '\0';
+
+
+    
+
+
+    return x;
+
+    
+    
+
+
+}
+
+
 int main()
 {
     printf("Hello world!\n");
 
     print_digit(3);
+
+    buf_strcpy(*"ABC");
 
     return 0;
 
