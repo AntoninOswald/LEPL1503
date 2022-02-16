@@ -57,6 +57,11 @@ char *buf_strcpy(const char *src) {
     char *x;
     x = (char *)malloc((strlen(src)+1)*sizeof(char));  /*    Multiplier la longueur du string par la taille du type de donnée*/
 
+    if (x == NULL)  /* cette ligne est très importante,  car elle permet de renvoier null si le malloc n'a pas fonctionné*/
+    {
+        return NULL;
+    }
+
     
     
 
