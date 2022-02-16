@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <unistd.h> /* Permet d'utiliser sleep*/
+
 
 
 void print_digit(int number){
@@ -34,18 +36,7 @@ size_t str_len(const char* s){
 
 
 
-int strcasecmp(const char *s1, const char *s2) {
 
-    const unsigned char *p1 = (const unsigned char *) s1;
-    const unsigned char *p2 = (const unsigned char *) s2;
-    int result;
-    if (p1 == p2)
-        return 0;
-
-
-    return 1;
-
-}
 
 
 
@@ -176,7 +167,7 @@ int strcasecmp(const char *s1, const char *s2){
         return -1;
     }
     return 1;
-}
+} 
 
 
 int pal2(char *str){ /*   Fonction à mettre sur Inginious, car utiliser la version avec pointeur/malloc ne compile pas*/
@@ -239,18 +230,18 @@ void *calloc2(size_t nmemb, size_t size){
 void *sleepy_malloc(size_t s){
     int c = 0;
     while (c < 10){
-        void* a = malloc(s)
+        void* a = malloc(s);
         if (a == NULL){
             sleep(5);
         } else{
             return a;
-            free(a);
+            
         }
         c++;
     }
 
     return NULL;
-    free(a);
+    
 }
 
 
