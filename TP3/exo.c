@@ -502,7 +502,25 @@ char* getName(product_t prod){
     
 }
 
+int prodEquals(product_t *ptrProd, product_t prod){
+    
+    if (strcmp(ptrProd->name, prod.name) == 0)
+    {
+        if (ptrProd->price == prod.price){
+            return 1;
+        } else
+        {
+            return 0;
+        }
+        
+        
+        
+    } else
+    {
+        return 0;
+    }
 
+}
 
 
 
