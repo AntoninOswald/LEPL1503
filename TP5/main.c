@@ -83,14 +83,199 @@ int save(point_t *pt, int size, char *filename) {
 
     return 0;
 
+}
 
 
 
+/*
+ * @pre filename != NULL, name of the file
+ * @post returns the sum of all integers stored in the binary file.
+ *       return -1 if the file can not be open.
+ *       return -2 if the file can not be closed.
+ *       return -3 if mmap() fails.
+ *       return -4 if munmap() fails.
+ *       return -5 if fstat() fails.
+ */
+int sum_file(char *filename) {
 
+    int fd;
 
+    fd = open(filename, O_RDONLY);
 
+    if (fd < 0)
+    {
+        return -1;
+    }
+
+    struct stat buffer;
+
+    if (fstat(fd, &buffer) < 0)
+    {
+        return -5;
+    }
+
+    if (buffer.st_size == 0){
+        close(fd);
+        return 0;
+    }
+
+    int result = 0;
+    int *mapper = mmap(NULL, buffer.st_size, PROT_READ, MAP_SHARED, fd, 0);
+
+    if (mapper == MAP_FAILED){
+        close(fd);
+        return -3;
+    }
+
+    for (int i = 0; i < (buffer.st_size/sizeof(int)); i++)
+    {
+        result += mapper[i];
+
+    }
+
+    if (close(fd) == -1){
+        munmap((void *) mapper, buffer.st_size);
+        return -2;
+    }
+
+    if (munmap((void *) mapper, buffer.st_size) < 0)
+    {
+        return -4;
+    }
+
+    return result;
 
 }
+
+
+int get(char *filename, int index)
+{
+
+    int fd;
+
+    fd = open(filename, O_RDONLY);
+
+    if (fd < 0)
+    {
+        return -1;
+    }
+
+    struct stat buffer;
+
+    if (fstat(fd, &buffer) < 0)
+    {
+        return -1;
+    }
+
+    if (buffer.st_size/sizeof(int) <= index){
+        
+        return -2;
+    }
+
+    
+    int *mapper = mmap(NULL, buffer.st_size, PROT_READ, MAP_SHARED, fd, 0);
+
+    if (mapper == MAP_FAILED){
+        
+        return -1;
+    }
+
+    int value = mapper[index];
+
+    if (close(fd) == -1){
+        munmap((void *) mapper, buffer.st_size);
+        return -1;
+    }
+
+    if (munmap((void *) mapper, buffer.st_size) < 0)
+    {
+        return -1;
+    }
+
+
+    return value;
+
+}
+
+void set(char *filename, int index, int value) 
+{
+
+    int fd;
+
+    fd = open(filename,O_RDWR,S_IRUSR);
+
+    if (fd < 0)
+    {
+        close(fd);
+        return;
+    }
+
+    struct stat buffer;
+
+    if (fstat(fd, &buffer) < 0)
+    {
+        close(fd);
+        return;
+    }
+
+    if (buffer.st_size/sizeof(int) <= index){
+        close(fd);
+        
+        return;
+    }
+
+
+    int *mapper = mmap(NULL, buffer.st_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+
+    if (mapper == MAP_FAILED){
+        close(fd);
+        
+        return;
+    }
+
+    mapper[index] = value;
+
+    if (msync( fd, sizeof(int), MS_SYNC) <0 )
+    {
+        close(fd);
+        return;
+    }
+
+
+
+    if (close(fd) == -1){
+        munmap((void *) mapper, buffer.st_size);
+        return;
+    }
+
+    if (munmap((void *) mapper, buffer.st_size) < 0)
+    {
+        close(fd);
+        return;
+    }
+
+}
+
+/*
+ * @pre file_name != NULL, name of the original file
+ *      new_file_name != NULL, name of the new file (the copy)
+ *
+ * @post copy the contents of {file_name} to {new_file_name}.
+ *       return 0 if the function terminates with success, -1 in case of errors.
+ */
+int copy(char *file_name, char *new_file_name) 
+{
+    inf fd_src = open(file_name, O_RDWR);
+    if (fd_src < 0)
+    {
+        return -1;
+    }
+
+}
+
+
+ 
+
 
 
 
