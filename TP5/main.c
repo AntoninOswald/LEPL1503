@@ -265,11 +265,73 @@ void set(char *filename, int index, int value)
  */
 int copy(char *file_name, char *new_file_name) 
 {
-    inf fd_src = open(file_name, O_RDWR);
+    int fd_src = open(file_name, O_RDWR);
     if (fd_src < 0)
     {
         return -1;
     }
+
+    struct stat buffer_src;
+
+    if (fstat(fd_src, &buffer_src) < 0)
+    {
+        return -1;
+    }
+    /* a retenir mode_t*/
+
+    
+    mode_t autorisations = buffer_src.st_mode;
+
+    int fd_dest = open(new_file_name, O_RDWR|O_CREAT|O_TRUNC, autorisations);
+
+    if (fd_dest < 0)
+    {
+        return -1;
+    }
+
+    if (ftruncate(fd_dest,buffer_src.st_size) < 0)
+    {
+        return -1;
+    }
+
+    void *mapper_src = mmap(NULL, buffer_src.st_size, PROT_READ, MAP_SHARED, fd_src, 0);
+
+    if (mapper_src == MAP_FAILED)
+    {
+        return -1;
+    }
+
+    void *mapper_dest = mmap(NULL, buffer_src.st_size, PROT_WRITE, MAP_SHARED, fd_dest, 0);
+
+    if (mapper_dest == MAP_FAILED)
+    {
+        munmap(mapper_src,buffer_src.st_size);
+        return -1;
+    }
+
+    memcpy(mapper_dest, mapper_src, buffer_src.st_size);
+
+    if (msync(mapper_dest, buffer_src.st_size, MS_SYNC) < 0)
+    {
+        munmap(mapper_src, buffer_src.st_size);
+        munmap(mapper_dest, buffer_src.st_size);
+        return -1;
+    }
+
+    if ((close(fd_src) < 0) | (close(fd_dest) < 0) )
+    {
+        munmap(mapper_src, buffer_src.st_size);
+        munmap(mapper_dest, buffer_src.st_size);
+        return -1;
+    }
+
+    if (((munmap(mapper_dest, buffer_src.st_size) < 0) | (munmap(mapper_src, buffer_src.st_size) < 0)))
+    {
+        return -1;
+    }
+
+    return 0;
+
 
 }
 
