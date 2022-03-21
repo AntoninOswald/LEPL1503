@@ -548,8 +548,8 @@ int main(int argc, char **argv)
 
     printf("%d\n", pal(a));
 
-    node_t *p = init_node(3);
-    printf("%d\n",p->value);
+   /* node_t *p = init_node(3);
+    printf("%d\n",p->value); */
 
     
 
