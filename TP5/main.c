@@ -153,113 +153,6 @@ int sum_file(char *filename) {
 }
 
 
-int get(char *filename, int index)
-{
-
-    int fd;
-
-    fd = open(filename, O_RDONLY);
-
-    if (fd < 0)
-    {
-        return -1;
-    }
-
-    struct stat buffer;
-
-    if (fstat(fd, &buffer) < 0)
-    {
-        return -1;
-    }
-
-    if (buffer.st_size/sizeof(int) <= index){
-        
-        return -2;
-    }
-
-    
-    int *mapper = mmap(NULL, buffer.st_size, PROT_READ, MAP_SHARED, fd, 0);
-
-    if (mapper == MAP_FAILED){
-        
-        return -1;
-    }
-
-    int value = mapper[index];
-
-    if (close(fd) == -1){
-        munmap((void *) mapper, buffer.st_size);
-        return -1;
-    }
-
-    if (munmap((void *) mapper, buffer.st_size) < 0)
-    {
-        return -1;
-    }
-
-
-    return value;
-
-}
-
-void set(char *filename, int index, int value) 
-{
-
-    int fd;
-
-    fd = open(filename,O_RDWR,S_IRUSR);
-
-    if (fd < 0)
-    {
-        close(fd);
-        return;
-    }
-
-    struct stat buffer;
-
-    if (fstat(fd, &buffer) < 0)
-    {
-        close(fd);
-        return;
-    }
-
-    if (buffer.st_size/sizeof(int) <= index){
-        close(fd);
-        
-        return;
-    }
-
-
-    int *mapper = mmap(NULL, buffer.st_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-
-    if (mapper == MAP_FAILED){
-        close(fd);
-        
-        return;
-    }
-
-    mapper[index] = value;
-
-    if (msync( fd, sizeof(int), MS_SYNC) <0 )
-    {
-        close(fd);
-        return;
-    }
-
-
-
-    if (close(fd) == -1){
-        munmap((void *) mapper, buffer.st_size);
-        return;
-    }
-
-    if (munmap((void *) mapper, buffer.st_size) < 0)
-    {
-        close(fd);
-        return;
-    }
-
-}
 
 /*
  * @pre file_name != NULL, name of the original file
@@ -458,29 +351,7 @@ int sort(char* filename)
 *
 * @return 0 if no error, -1 otherwise
 */
-int protect(void inc(void), int nb, pthread_mutex_t* mutex)
-{
 
-    for (int i = 0; i < nb; i++)
-    {
-        if (pthread_mutex_lock(mutex) != 0)
-        {
-            return -1;
-        }
-        inc();
-        if (pthread_mutex_unlock(mutex) != 0)
-        {
-            return -1;
-        }
-
-
-        
-    }
-
-    return 0;
-    
-
-}
 
 
 /*
@@ -508,44 +379,7 @@ int protect(void inc(void), int nb, pthread_mutex_t* mutex)
 *         -3 if you can't create the second thread
 *         -4 if you can't join the second thread
 */
-int doMyWork(void* long_computing(void*), void* backup_computing(void*), char* string, int ret_value)
-{
-    pthread_t first;
 
-    int *ret;
-
-    if (pthread_create(&first, NULL, long_computing, (void *) string) != 0)
-    {
-        return -1;
-    }
-
-    if (pthread_join(first, (void **)&ret) != 0)
-    {
-        return -2;
-    }
-
-    if (*ret == ret_value)
-    {
-        return *ret;
-    }else
-    {
-        pthread_t second;
-        if (pthread_create(&second, NULL, backup_computing, (void *) string) != 0)
-        {
-            return -3;
-        }
-
-        if (pthread_join(second, (void *) &ret) != 0)
-        {
-            return -4;
-        }
-
-        return *ret;
-    }
-    
-
-
-}
 
 
 typedef struct data {
@@ -637,10 +471,6 @@ data_t* get(data_t** buf, int len, int* first, int* last, int* in)
 
 
 int main(int argc, char **argv){
-
-
-
-
-
+    printf("%s\n", "You have to generate coefficients before printing them");
     
 }
